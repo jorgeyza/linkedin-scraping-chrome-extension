@@ -3,6 +3,7 @@
   "name": "Linkedin Scraper",
   "version": "1.0",
   "description": "Get Information from contact profiles",
+  "background": {"type":"module"},
   "action": {
     "default_popup": "popup.html",
     "default_icon": {

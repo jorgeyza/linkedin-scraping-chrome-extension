@@ -1,14 +1,11 @@
 const btnScrap = document.querySelector('#scrapingButton');
 
 btnScrap.addEventListener('click', async () => {
-  const [tab] = await chrome.tabs.query({active: true, currentWindow: true});
-
-  const port = chrome.tabs.connect(tab.id);
-  port.postMessage({action: 'scrapingProfile'});
+  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
   if (tab !== null) {
     chrome.scripting.executeScript({
-      target: {tabId: tab.id},
+      target: { tabId: tab.id },
       function: scrapingProfile,
     });
   }
@@ -23,7 +20,7 @@ const scrapingProfile = async () => {
       }, milliseconds);
     });
 
-  const autoscrollToElement = async function(cssSelector) {
+  const autoScrollToElement = async function(cssSelector) {
     const exists = document.querySelector(cssSelector);
 
     while (exists) {
@@ -85,7 +82,7 @@ const scrapingProfile = async () => {
   };
 
   const getPersonalInformation = async () => {
-    const {personalInformation: selector} = selectorProfile;
+    const { personalInformation: selector } = selectorProfile;
     const elementNameProfile = document.querySelector(selector.name);
     const elementNameTitle = document.querySelector(selector.title);
     const elementLocation = document.querySelector(selector.location);
@@ -104,7 +101,7 @@ const scrapingProfile = async () => {
   };
 
   const getExperienceInformation = async () => {
-    const {experienceInformation: selector} = selectorProfile;
+    const { experienceInformation: selector } = selectorProfile;
     const experiencesRawList = document.querySelectorAll(selector.list);
     const experiencesRawArray = Array.from(experiencesRawList);
 
@@ -158,14 +155,14 @@ const scrapingProfile = async () => {
   };
 
   const getEducationInformation = async () => {
-    const {educationInformation: selector} = selectorProfile;
+    const { educationInformation: selector } = selectorProfile;
     const educationItems = document.querySelectorAll(selector.list);
     const educationArray = Array.from(educationItems);
     const educations = educationArray.map((el) => {
       const institution = el.querySelector(selector.institution).innerText;
       const career = el.querySelector(selector.career).innerText;
       const date = el.querySelector(selector.date).innerText;
-      return {institution, career, date};
+      return { institution, career, date };
     });
     return educations;
   };
@@ -195,14 +192,14 @@ const scrapingProfile = async () => {
     pre.innerText = 'Estamos extrayendo la información!!!!';
     div.appendChild(pre);
     div.appendChild(button);
-    return {div, pre, button};
+    return { div, pre, button };
   };
 
   // Scroll to all information
-  const {div, pre, button} = createPopup();
+  const { div, pre, button } = createPopup();
 
   pre.innerText = 'Escaneando el perfil';
-  await autoscrollToElement('body');
+  await autoScrollToElement('body');
   await clickOnMoreResume();
 
   // Scraping Complete Profile
@@ -214,25 +211,10 @@ const scrapingProfile = async () => {
   await wait(1000);
 
   // Setting data to send information
-  const profile = {...personalInformation, experiences: experienceInformation, educations: educationInformation};
+  const profile = { ...personalInformation, experiences: experienceInformation, educations: educationInformation };
   pre.innerText = JSON.stringify(profile, null, 2);
 
   button.addEventListener('click', () => {
     div.remove();
   });
-}
-
-// Comunication
-;(function() {
-  chrome.runtime.onConnect.addListener((port) => {
-    port.onMessage.addListener((msg) => {
-      const {action} = msg;
-      console.log(action);
-      if (action === 'scraping') scrapingProfile();
-    });
-  });
-})();
-
-// Reto: escribir en el popup una palabra que será inyectada en el buscador de linkedin, se obtendrán los resultados
-// y se mostrarán en una lista, al hacer click en uno de ellos se abrirá la página de linkedin de ese perfil
-// y se mostrará la información del perfil. Esa informacion se deberá scrapear y almacenar en un servicio de backend.
+};
