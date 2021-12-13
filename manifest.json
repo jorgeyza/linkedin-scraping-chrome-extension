@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Linkedin Scraper",
+  "name": "Linkedin Scraperlalalala",
   "version": "1.0",
   "description": "Get Information from contact profiles",
   "background": {"type":"module"},
